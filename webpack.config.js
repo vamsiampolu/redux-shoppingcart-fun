@@ -1,5 +1,10 @@
 const webpack = require('webpack')
+const merge = require('webpack-merge')
 const path = require('path')
+
+const DefinePlugin = webpack.DefinePlugin
+const HmrPlugin = webpack.HotModuleReplacementPlugin
+const NoErrorsPlugin = webpack.NoErrorsPlugin
 
 const FILE_PATHS = {
   entry: path.resolve('./app.js'),
@@ -8,12 +13,7 @@ const FILE_PATHS = {
   output: path.resolve('./build/public/assets')
 }
 
-const DefinePlugin = webpack.DefinePlugin
-
-const HmrPlugin = webpack.HotModuleReplacementPlugin
-const NoErrorsPlugin = webpack.NoErrorsPlugin
-
-const dev = {
+const devOnly = {
   entry: FILE_PATHS.entry,
   output: {
     path: FILE_PATHS.output,
@@ -57,17 +57,14 @@ const dev = {
 }
 
 const hmr = {
-  entry: [
-    FILE_PATHS.hmrEntry,
-    FILE_PATHS.entry
-  ],
-  plugins: [
-    new HmrPlugin(),
-    new NoErrorsPlugin()
-  ]
+  entry: [FILE_PATHS.hmrEntry, FILE_PATHS.entry],
+  plugins: [new HmrPlugin(), new NoErrorsPlugin()]
 }
 
-const devServerOptions = {
+const dev = merge(devOnly, hmr)
+
+const devMiddleware = {
+  serverSideRender: false, // enable it after getting the middleware working
   stats: 'errors-only',
   publicPath: FILE_PATHS.publicPath,
   watchOptions: {
@@ -76,8 +73,16 @@ const devServerOptions = {
   }
 }
 
+const hotMiddleware = {
+  reload: true,
+  overlay: true,
+  heartbeat: 2000,
+  timeout: 2000
+}
+
 module.exports = {
-  devServerOptions,
+  devMiddleware,
+  hotMiddleware,
   dev,
   hmr
 }

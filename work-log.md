@@ -19,7 +19,6 @@ I have created this to inform myself of the configuration options for `webpack-d
 |:----:|:---------:|:-----:|
 |publicPath| required, must be the same as the one provided to `webpack`, used to serve files|`'/assets/'`|
 |watchOptions| good to have, windows and some linux flavors have issues with `webpack`, use this to poll for changes at regular intervals|`{poll: 1000, aggregateTimeout}`|
-|historyApiFallback|redirect all 404s back to `index.html`, meant to be used in conjunction with browser history|`true`|
 
 > When using watchOptions with the example config presented above, it will check the file system for changes every 1 second and wait 300ms before sending an update down. Is this super hot update nope, but at least it works.
 
@@ -40,5 +39,7 @@ if(config.historyApiFallback) {
 }
 ```
 
-An alternative approach involves setting it up yourself, take a look at react-router#676
+The express server has been setup today, it has not been tested yet, I realized that I needed to pass the hmr options to the config and not to the middleware, it would be used to generate the compiler and not for invoking the middleware. I did that and I added the config to a  server file, the middleware has been added to express.
 
+An alternative approach involves setting it up yourself, take a look at react-router#676
+I have decided to go with the history api fallback package, it seems to be quite stable and well maintained, in addition, glamorous requires glamor to be installed.(Done) 
