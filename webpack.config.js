@@ -6,11 +6,12 @@ const DefinePlugin = webpack.DefinePlugin
 const HmrPlugin = webpack.HotModuleReplacementPlugin
 const NoErrorsPlugin = webpack.NoErrorsPlugin
 
+// path.resolve('./build/public/assets')
 const FILE_PATHS = {
-  entry: path.resolve('./app.js'),
+  entry: path.resolve('./src/app.js'),
+  reactHotLoader: 'react-hot-loader/patch',
   hmrEntry: 'webpack-hot-middleware/client',
-  publicPath: '/assets/',
-  output: path.resolve('./build/public/assets')
+  output: '/' // this is the path used by webpack-dev-middleware, the docs say no real path is required, just pass in `/`
 }
 
 const devOnly = {
@@ -57,32 +58,12 @@ const devOnly = {
 }
 
 const hmr = {
-  entry: [FILE_PATHS.hmrEntry, FILE_PATHS.entry],
+  entry: [FILE_PATHS.reactHotLoader, FILE_PATHS.hmrEntry, FILE_PATHS.entry],
   plugins: [new HmrPlugin(), new NoErrorsPlugin()]
 }
 
 const dev = merge(devOnly, hmr)
 
-const devMiddleware = {
-  serverSideRender: false, // enable it after getting the middleware working
-  stats: 'errors-only',
-  publicPath: FILE_PATHS.publicPath,
-  watchOptions: {
-    poll: 1000,
-    aggregateTimeout: 300
-  }
-}
-
-const hotMiddleware = {
-  reload: true,
-  overlay: true,
-  heartbeat: 2000,
-  timeout: 2000
-}
-
 module.exports = {
-  devMiddleware,
-  hotMiddleware,
-  dev,
-  hmr
+  dev
 }

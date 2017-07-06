@@ -43,3 +43,23 @@ The express server has been setup today, it has not been tested yet, I realized 
 
 An alternative approach involves setting it up yourself, take a look at react-router#676
 I have decided to go with the history api fallback package, it seems to be quite stable and well maintained, in addition, glamorous requires glamor to be installed.(Done) 
+
+I tried to run webpack without properly installing all my dependencies, I have setup my prev config which relied on having  access to babel config where babel transform plugins for template literals and classes need to be provided in order to enable hot reloading, we will see if that is nessecary in order to work with the package.
+
+Also remember to install the `beta` version of `react-hot-loader`, otherwise, things will go to hell for you quite easily
+
+Everything but webpack-dev-middleware works now, I can compiler my app using webpack, I have enabled `serverSideRender` with the middleware.
+When this feature is added:
+
+1. provides the `stats` required for server side rendering as `res.locals.webpackStats`
+
+2. take the stats, convert it `toJSON()`, pick the `assetsByChunkName` from it, get assets by type
+   and rener them using `res.send`
+
+3.  also, do not forget to add `serverSideRender` as an option to the devMiddleware configuration and set the value to true
+
+Having done all of this, I am confronted with an ugly reality, nothing works the first time and we as developers are too lazy to properly
+read the docs and they as devs are too lazy to write good docs. Also, there might be certain issues which could be affecting us, are there
+issues that need working around, are there errors in the stats that we seem to take for granted.
+
+Resolving this issue will be the next step to nirvana
