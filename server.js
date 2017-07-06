@@ -22,7 +22,8 @@ const publicPath = '/assets/'
 
 const devMiddlewareConfig = {
   serverSideRender: true,
-  stats: 'errors-only',
+  stats: 'normal',
+  index: path.resolve('./assets/index.html'),
   publicPath: publicPath,
   watchOptions: {
     poll: 1000,
@@ -31,6 +32,7 @@ const devMiddlewareConfig = {
 }
 
 const hotMiddlewareConfig = {
+  path: '/webpack_hmr',
   reload: true,
   overlay: true,
   heartbeat: 2000,
@@ -50,13 +52,12 @@ const devMiddleware = devMiddlewareCreator(compiler, devMiddlewareConfig)
 const hotMiddleware = hotMiddlewareCreator(compiler, hotMiddlewareConfig)
 
 const app = express()
-app.use('/', historyApiFallback)
 app.use(devMiddleware)
 app.use(hotMiddleware)
-app.use(express.static(assetPath))
 
 app.use((req, res) => {
-  const stats = res.locals.webpackStats.toJSON()
+  console.log(req.locals)
+  const stats = req.locals.webpackStats.toJSON()
   const assets = normalizeAssets(stats.assetsByChunkName.bundle)
   const styles = getLinks(assets)
   const scripts = getScripts(assets)

@@ -4,7 +4,7 @@ const path = require('path')
 
 const DefinePlugin = webpack.DefinePlugin
 const HmrPlugin = webpack.HotModuleReplacementPlugin
-const NoErrorsPlugin = webpack.NoErrorsPlugin
+const NoErrorsPlugin = webpack.NoEmitOnErrorsPlugin
 
 // path.resolve('./build/public/assets')
 const FILE_PATHS = {
@@ -18,6 +18,7 @@ const devOnly = {
   entry: FILE_PATHS.entry,
   output: {
     path: FILE_PATHS.output,
+    publicPath: '/assets/',
     filename: 'bundle.js'
   },
   devtool: 'cheap-module-inline-source-map',
