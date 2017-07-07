@@ -42,7 +42,7 @@ if(config.historyApiFallback) {
 The express server has been setup today, it has not been tested yet, I realized that I needed to pass the hmr options to the config and not to the middleware, it would be used to generate the compiler and not for invoking the middleware. I did that and I added the config to a  server file, the middleware has been added to express.
 
 An alternative approach involves setting it up yourself, take a look at react-router#676
-I have decided to go with the history api fallback package, it seems to be quite stable and well maintained, in addition, glamorous requires glamor to be installed.(Done) 
+I have decided to go with the history api fallback package, it seems to be quite stable and well maintained, in addition, glamorous requires glamor to be installed.(Done)
 
 I tried to run webpack without properly installing all my dependencies, I have setup my prev config which relied on having  access to babel config where babel transform plugins for template literals and classes need to be provided in order to enable hot reloading, we will see if that is nessecary in order to work with the package.
 
@@ -62,4 +62,31 @@ Having done all of this, I am confronted with an ugly reality, nothing works the
 read the docs and they as devs are too lazy to write good docs. Also, there might be certain issues which could be affecting us, are there
 issues that need working around, are there errors in the stats that we seem to take for granted.
 
-Resolving this issue will be the next step to nirvana
+This project's stated goal was to work on React, I have spent a  long time working on webpack, webpack is a dream killing machine that accepts time and returns cryptic errors, giant configuration files that need to be broken down into smaller pieces, options that dont make sense and features that we dont even need.
+
+I added the module.hot flag to try and fix the issue occuring with react-hot-loader/patch which was complaining the `development` was not defined.
+Changing the order of reactHotLoader and webpackHmr entries did not affect the output much, there was no change to the error, it might be an incompatibility between the middleware and react-hot-loader.
+
+I just have the server working correctly with server rendering config from the webpack-dev-middleare although no output can be displayed, it can be a publicPath issue. I got the code working with the node debugger's support. I have to take this slow and keep debugging. 
+
+This gives me a new error:
+
+> the first error is caused by the react-hot-loader/patch entry
+
+```
+  Uncaught ReferenceError: development is not defined
+  at Object.<anonymous> (patch.js:5)
+  at __webpack_require__ (bootstrap 156c1de…:661)
+  at fn (bootstrap 156c1de…:87)
+  at Object.<anonymous> (patch.js:1)
+  at __webpack_require__ (bootstrap 156c1de…:661)
+  at fn (bootstrap 156c1de…:87)
+  at Object.options.path (AppContainer.js:9)
+  at __webpack_require__ (bootstrap 156c1de…:661)
+at validateFormat (bootstrap 156c1de…:707)
+  at bundle.js:711
+
+20:42:34.199 localhost/:1 EventSource's response has a MIME type ("text/html") that is not "text/event-stream". Aborting the connection.
+20:43:54.928 :3000/__webpack_hmr:1 GET http://localhost:3000/__webpack_hmr net::ERR_EMPTY_RESPONSE
+20:44:26.174 localhost/:1 EventSource's response has a MIME type ("text/html") that is not "text/event-stream". Aborting the connection.
+```

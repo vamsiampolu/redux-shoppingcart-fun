@@ -8,7 +8,7 @@ const NoErrorsPlugin = webpack.NoEmitOnErrorsPlugin
 
 // path.resolve('./build/public/assets')
 const FILE_PATHS = {
-  entry: path.resolve('./src/app.js'),
+  entry: path.resolve('./src/index.js'),
   reactHotLoader: 'react-hot-loader/patch',
   hmrEntry: 'webpack-hot-middleware/client',
   output: '/' // this is the path used by webpack-dev-middleware, the docs say no real path is required, just pass in `/`
@@ -17,7 +17,7 @@ const FILE_PATHS = {
 const devOnly = {
   entry: FILE_PATHS.entry,
   output: {
-    path: FILE_PATHS.output,
+    path: '/',
     publicPath: '/assets/',
     filename: 'bundle.js'
   },
@@ -59,7 +59,7 @@ const devOnly = {
 }
 
 const hmr = {
-  entry: [FILE_PATHS.reactHotLoader, FILE_PATHS.hmrEntry, FILE_PATHS.entry],
+  entry: [FILE_PATHS.hmrEntry, FILE_PATHS.reactHotLoader, FILE_PATHS.entry],
   plugins: [new HmrPlugin(), new NoErrorsPlugin()]
 }
 

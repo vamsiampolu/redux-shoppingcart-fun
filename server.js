@@ -1,3 +1,4 @@
+// process.env.NODE_ENV = 'development'
 const express = require('express')
 const path = require('path')
 const webpack = require('webpack')
@@ -12,18 +13,20 @@ const getLinks = assets => {
   const links = styles.map(path => `<link rel="stylesheet" href="${path}" />`)
   return links.join('\n')
 }
-const getScripts = assets => {
-  const js = assets.filter(path => path.endsWith('.js'))
-  const scripts = js.map(path => `<script src="${path}"></script>`)
-  return scripts.join('\n')
-}
 
 const publicPath = '/assets/'
+
+const getScripts = assets => {
+  const js = assets.filter(path => path.endsWith('.js'))
+  const scripts = js.map(
+    path => `<script src="${publicPath}/${path}"></script>`
+  )
+  return scripts.join('\n')
+}
 
 const devMiddlewareConfig = {
   serverSideRender: true,
   stats: 'normal',
-  index: path.resolve('./assets/index.html'),
   publicPath: publicPath,
   watchOptions: {
     poll: 1000,
@@ -32,7 +35,7 @@ const devMiddlewareConfig = {
 }
 
 const hotMiddlewareConfig = {
-  path: '/webpack_hmr',
+  path: publicPath,
   reload: true,
   overlay: true,
   heartbeat: 2000,
@@ -52,17 +55,19 @@ const devMiddleware = devMiddlewareCreator(compiler, devMiddlewareConfig)
 const hotMiddleware = hotMiddlewareCreator(compiler, hotMiddlewareConfig)
 
 const app = express()
+app.use(express.static(__dirname + '/public'))
 app.use(devMiddleware)
 app.use(hotMiddleware)
 
 app.use((req, res) => {
-  console.log(req.locals)
-  const stats = req.locals.webpackStats.toJSON()
-  const assets = normalizeAssets(stats.assetsByChunkName.bundle)
+  const stats = res.locals.webpackStats.toJson()
+  const assets = normalizeAssets(stats.assetsByChunkName.main)
   const styles = getLinks(assets)
   const scripts = getScripts(assets)
+  debugger
   res.send(
     `
+<!DOCTYPE html>
     <html>
       <head>
         <title>Webpack is crazy</title>
