@@ -3,6 +3,7 @@ import {render} from 'react-dom'
 import {AppContainer} from 'react-hot-loader'
 import Main from './app'
 
+debugger
 const app = document.getElementById('app')
 
 const renderWithHmr = Component => {

@@ -90,3 +90,9 @@ at validateFormat (bootstrap 156c1de…:707)
 20:43:54.928 :3000/__webpack_hmr:1 GET http://localhost:3000/__webpack_hmr net::ERR_EMPTY_RESPONSE
 20:44:26.174 localhost/:1 EventSource's response has a MIME type ("text/html") that is not "text/event-stream". Aborting the connection.
 ```
+
+8 July 2017
+
+I found that the [issue](https://github.com/glenjamin/webpack-hot-middleware/issues/26) was really helpful when trying to solve the issue, I removed the path config, heartbeat and timeout for the `webpack-hot-middleware` config and added the `historyFallbackApi` immediately after, it solved the issue for me.
+
+The `react-hot-loader` troubleshooting guide asks to exclude node_modules and include only app when working with it in the [Troubleshooting guide](https://github.com/gaearon/react-hot-loader/blob/master/docs/Troubleshooting.md), still the error persists.

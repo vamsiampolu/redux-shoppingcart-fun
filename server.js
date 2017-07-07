@@ -18,9 +18,7 @@ const publicPath = '/assets/'
 
 const getScripts = assets => {
   const js = assets.filter(path => path.endsWith('.js'))
-  const scripts = js.map(
-    path => `<script src="${publicPath}/${path}"></script>`
-  )
+  const scripts = js.map(path => `<script src="${path}"></script>`)
   return scripts.join('\n')
 }
 
@@ -35,11 +33,8 @@ const devMiddlewareConfig = {
 }
 
 const hotMiddlewareConfig = {
-  path: publicPath,
   reload: true,
-  overlay: true,
-  heartbeat: 2000,
-  timeout: 2000
+  overlay: true
 }
 
 const devMiddlewareCreator = require('webpack-dev-middleware')
@@ -64,7 +59,6 @@ app.use((req, res) => {
   const assets = normalizeAssets(stats.assetsByChunkName.main)
   const styles = getLinks(assets)
   const scripts = getScripts(assets)
-  debugger
   res.send(
     `
 <!DOCTYPE html>
@@ -82,6 +76,8 @@ app.use((req, res) => {
 `
   )
 })
+
+app.use(historyApiFallback)
 
 app.listen(3000, err => {
   if (!err) {
