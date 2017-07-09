@@ -189,5 +189,8 @@ I think having `serverSideRender` with `webpack-dev-middleware` would be more in
 
 Exciting news, there is server side rendering in a template, beyond that there is very sad news, it seems to be rendering the output of the `ejs` template directly into the html as strings, so it is a template issue that `CAN BE FIXED`. <Appropriate celebratory emoji goes here>
 
-Time to read the ejs docs(for the first time), and it WORKS, it works, YES!!!, I had to use `<%- %>` to enclose my markup instead of `<%= %>` which escapes the HTML, given that we are injecting `script tags`, we need to prevent various kinds of injections from occuring. I will look into this next.
+Time to read the ejs docs(for the first time), and it WORKS, it works, YES!!!, I had to use `<%- %>` to enclose my markup instead of `<%= %>` which escapes the HTML.
 
+I have picked a  css framework that I want to use in my app, only instead of using it as css, we going css-in-js, with server rendering <sweating profusely>, the framework I picked is called milligram. I am going to take its grid and use it as required, also I will try and avoid using css shorthand syntax and explicitly add properties where required so that it is easy for me to read.
+
+I have created styling using `glamorous` but it does not work because we need server rendering with css either inline or in a link tag, so I need to do server rendering for the css-in-js library

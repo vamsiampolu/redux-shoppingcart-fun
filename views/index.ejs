@@ -3,11 +3,17 @@
   <head>
     <title>Using server side render with webpack-dev-middleware</title>
     <%- styles %>
+    <style type="text/css">
+      <%= css %>
+    </style>
   </head>
   <body>
     <div id="app">
       <%- html %>
     </div>
     <%- scripts %>
+    <script type="text/javascript">
+      window._glam = JSON.stringify(<%= ids %>)
+    </script>
   </body>
 </html>

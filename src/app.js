@@ -1,7 +1,12 @@
 import React from 'react'
+import glamorous from 'glamorous'
+
+import {container} from './milligram/grid'
+
+const Container = glamorous.div(container)
 
 export default class Main extends React.Component {
   render () {
-    return <div>Hello, World!</div>
+    return <Container>Hello, World!</Container>
   }
 }
