@@ -61,10 +61,7 @@ const devOnly = {
 
 const hmr = {
   entry: [FILE_PATHS.reactHotLoader, FILE_PATHS.hmrEntry, FILE_PATHS.entry],
-  plugins: [new HmrPlugin(), new NoErrorsPlugin()],
-  devServer: {
-    hot: true
-  }
+  plugins: [new HmrPlugin(), new NoErrorsPlugin()]
 }
 
 const dev = merge(devOnly, hmr)

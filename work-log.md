@@ -153,3 +153,10 @@ app.use((req, res) => {
 ```
 
 throws `development` is not defined, the other way around throws `< cannot be parsed` because html is sent down as javascript.
+I tried adding a `development` env flag for react-hot-loader in `.babelrc`. It has caused no effect so far when I tried to use it as:
+
+```
+node server.js
+NODE_ENV=development node server.js
+```
+
