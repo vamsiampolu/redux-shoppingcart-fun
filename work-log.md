@@ -96,3 +96,60 @@ at validateFormat (bootstrap 156c1de…:707)
 I found that the [issue](https://github.com/glenjamin/webpack-hot-middleware/issues/26) was really helpful when trying to solve the issue, I removed the path config, heartbeat and timeout for the `webpack-hot-middleware` config and added the `historyFallbackApi` immediately after, it solved the issue for me.
 
 The `react-hot-loader` troubleshooting guide asks to exclude node_modules and include only app when working with it in the [Troubleshooting guide](https://github.com/gaearon/react-hot-loader/blob/master/docs/Troubleshooting.md), still the error persists.
+
+**Assemble the failed pieces of code here from the stacktrace**
+
+The stuff that comes before it is just webpack trying to resolve the request, I am using the `webpack-hot-middleware`, so it calls:
+
+```
+return hotCreateRequire(136)(__webpack_require__.s = 136);
+```
+
+`react-hot-loader/patch is part of the entry and was imported
+
+
+this was called inside `react-hot-loader/patch`:
+
+```js
+if (!module.hot || process.env.NODE_ENV === 'production') {
+  module.exports = require('./patch.prod');
+} else {
+  module.exports = require('./patch.dev');
+}
+```
+
+Removing `static` middleware for serving assets changes the error, which is good, it means that we dont download the `bundle` correctly anymore, it might purely be due to the middleware ordering(??). A copy of the error here:
+
+> 06:11:41.652 bundle.js:2 Uncaught SyntaxError: Unexpected token <
+
+I am working with little or limited information, often finding myself unwilling or incapable of obtaining more, re-ordering the middleware is an idiotic idea and ofcourse it does not work, I tried disabling the `historyApiFallback and it does not work either, we need to be able to have a `public dir` and `express.static`, then the question is WHY?, is server side render option from webpack-dev-middleware not working, it considers the html as a bundle.
+
+Is it the middleware configuration, take a look at the readme of webpack-dev-middleware again, it looks no different. It looks like `serverSideRender and static middleware are not playing well together:
+
+```
+app.use(express.static(__dirname + '/public')) // could this be due to publicPath being a value of  '/assets/'
+app.use((req, res) => {
+    const stats = res.locals.webpackStats.toJson()
+    const assets = normalizeAssets(stats.assetsByChunkName.main)
+    const styles = getLinks(assets)
+    const scripts = getScripts(assets)
+    res.send(
+        `
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Webpack is crazy</title>
+        ${styles}
+        </head>
+        <body>
+        <div id="app">
+        </div>
+        ${scripts}
+        </body>
+        </html>
+        `
+        )
+})
+```
+
+throws `development` is not defined, the other way around throws `< cannot be parsed` because html is sent down as javascript.

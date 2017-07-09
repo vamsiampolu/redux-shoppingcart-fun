@@ -17,7 +17,7 @@ const devOnly = {
   entry: FILE_PATHS.entry,
   output: {
     path: '/',
-    publicPath: '/assets/',
+    publicPath: 'http://localhost:3000/assets/',
     filename: 'bundle.js'
   },
   devtool: 'source-map',

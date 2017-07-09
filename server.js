@@ -1,6 +1,5 @@
 // process.env.NODE_ENV = 'development'
 const express = require('express')
-const path = require('path')
 const webpack = require('webpack')
 const historyApiFallback = require('connect-history-api-fallback')
 
@@ -41,7 +40,6 @@ const devMiddlewareCreator = require('webpack-dev-middleware')
 const hotMiddlewareCreator = require('webpack-hot-middleware')
 
 const options = require('./webpack.config')
-const assetPath = path.resolve('./public')
 
 const {dev: devConfig} = options
 
@@ -50,10 +48,9 @@ const devMiddleware = devMiddlewareCreator(compiler, devMiddlewareConfig)
 const hotMiddleware = hotMiddlewareCreator(compiler, hotMiddlewareConfig)
 
 const app = express()
-app.use(express.static(__dirname + '/public'))
 app.use(devMiddleware)
 app.use(hotMiddleware)
-
+app.use(express.static(__dirname + '/public'))
 app.use((req, res) => {
   const stats = res.locals.webpackStats.toJson()
   const assets = normalizeAssets(stats.assetsByChunkName.main)
@@ -77,7 +74,7 @@ app.use((req, res) => {
   )
 })
 
-app.use(historyApiFallback)
+// app.use(historyApiFallback)
 
 app.listen(3000, err => {
   if (!err) {
