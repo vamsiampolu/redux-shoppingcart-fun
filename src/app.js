@@ -1,5 +1,7 @@
 import React from 'react'
 
-export default function Main () {
-  return <div>hello world</div>
+export default class Main extends React.Component {
+  render () {
+    return <div>Hello, World!</div>
+  }
 }

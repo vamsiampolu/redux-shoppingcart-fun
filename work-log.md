@@ -151,12 +151,43 @@ app.use((req, res) => {
         )
 })
 ```
+9 Jul 2017
 
 throws `development` is not defined, the other way around throws `< cannot be parsed` because html is sent down as javascript.
 I tried adding a `development` env flag for react-hot-loader in `.babelrc`. It has caused no effect so far when I tried to use it as:
+
 
 ```
 node server.js
 NODE_ENV=development node server.js
 ```
+
+I have barely got it working, a problem cannot be solved only until a stackoverflow question or a github issue is created. However, it relies on ``express.static` instead of relying on `serverSideRender` from `webpack-dev-middleware`.
+
+I also find that `HMR` is not working correctly, it shows me the issue:
+
+```
+[HMR] connected
+15:39:36.213 process-update.js:27 [HMR] Checking for updates on the server...
+15:39:36.230 process-update.js:81 [HMR] The following modules couldn't be hot updated: (Full reload needed)
+This is usually because the modules which have changed (and their parents) do not know how to hot reload themselves. See http://webpack.github.io/docs/hot-module-replacement-with-webpack.html for more details.
+logUpdates @ process-update.js:81
+applyCallback @ process-update.js:49
+(anonymous) @ process-update.js:57
+15:39:36.230 process-update.js:89 [HMR]  - ./src/app.js
+(anonymous) @ process-update.js:89
+logUpdates @ process-update.js:88
+applyCallback @ process-update.js:49
+(anonymous) @ process-update.js:57
+15:39:37.640 client.js:200 [HMR] bundle rebuilding
+15:39:37.855 client.js:208 [HMR] bundle rebuilt in 196ms
+```
+
+This means that `webpack-hot-middleware` is working correctly, however, it does not seem to/want to work with react-hot-loader due to the way it has been configured.
+
+I think having `serverSideRender` with `webpack-dev-middleware` would be more interesting, so I will try and remove `static middleware and try to fix the issue
+
+Exciting news, there is server side rendering in a template, beyond that there is very sad news, it seems to be rendering the output of the `ejs` template directly into the html as strings, so it is a template issue that `CAN BE FIXED`. <Appropriate celebratory emoji goes here>
+
+Time to read the ejs docs(for the first time), and it WORKS, it works, YES!!!, I had to use `<%- %>` to enclose my markup instead of `<%= %>` which escapes the HTML, given that we are injecting `script tags`, we need to prevent various kinds of injections from occuring. I will look into this next.
 

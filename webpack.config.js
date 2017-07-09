@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const path = require('path')
 
-const DefinePlugin = webpack.DefinePlugin
+const EnvironmentPlugin = webpack.EnvironmentPlugin
 const HmrPlugin = webpack.HotModuleReplacementPlugin
 const NoErrorsPlugin = webpack.NoEmitOnErrorsPlugin
 
@@ -53,15 +53,21 @@ const devOnly = {
     ]
   },
   plugins: [
-    new DefinePlugin({
-      'process.env.NODE_ENV': 'development'
+    new EnvironmentPlugin({
+      NODE_ENV: 'development'
     })
   ]
 }
 
 const hmr = {
   entry: [FILE_PATHS.reactHotLoader, FILE_PATHS.hmrEntry, FILE_PATHS.entry],
-  plugins: [new HmrPlugin(), new NoErrorsPlugin()]
+  plugins: [
+    new HmrPlugin(),
+    new NoErrorsPlugin(),
+    new EnvironmentPlugin({
+      NODE_ENV: 'development'
+    })
+  ]
 }
 
 const dev = merge(devOnly, hmr)

@@ -1,7 +1,9 @@
 // process.env.NODE_ENV = 'development'
 const express = require('express')
 const webpack = require('webpack')
-const historyApiFallback = require('connect-history-api-fallback')
+const React = require('react')
+const App = require('./src/app').default
+const {renderToString} = require('react-dom/server')
 
 const normalizeAssets = assets => {
   return Array.isArray(assets) ? assets : [assets]
@@ -48,33 +50,21 @@ const devMiddleware = devMiddlewareCreator(compiler, devMiddlewareConfig)
 const hotMiddleware = hotMiddlewareCreator(compiler, hotMiddlewareConfig)
 
 const app = express()
+app.set('view engine', 'ejs')
 app.use(devMiddleware)
-app.use(hotMiddleware)
-app.use(express.static(__dirname + '/public'))
+
 app.use((req, res) => {
   const stats = res.locals.webpackStats.toJson()
   const assets = normalizeAssets(stats.assetsByChunkName.main)
   const styles = getLinks(assets)
   const scripts = getScripts(assets)
-  res.send(
-    `
-<!DOCTYPE html>
-    <html>
-      <head>
-        <title>Webpack is crazy</title>
-        ${styles}
-      </head>
-      <body>
-      <div id="app">
-      </div>
-      ${scripts}
-      </body>
-    </html>
-`
-  )
+  debugger
+  const html = renderToString(<App />)
+  const locals = {scripts, styles, html}
+  res.render('index', locals)
 })
-
-// app.use(historyApiFallback)
+app.use(hotMiddleware)
+// app.use(express.static(__dirname + '/public'))
 
 app.listen(3000, err => {
   if (!err) {
