@@ -194,3 +194,195 @@ Time to read the ejs docs(for the first time), and it WORKS, it works, YES!!!, I
 I have picked a  css framework that I want to use in my app, only instead of using it as css, we going css-in-js, with server rendering <sweating profusely>, the framework I picked is called milligram. I am going to take its grid and use it as required, also I will try and avoid using css shorthand syntax and explicitly add properties where required so that it is easy for me to read.
 
 I have created styling using `glamorous` but it does not work because we need server rendering with css either inline or in a link tag, so I need to do server rendering for the css-in-js library
+
+10 July 2017
+
+Apologies for the delay in publishing this work-log, yesterday I managed to get almost EVERYTHING(tm) working, by that I mean:
+
+1. the server side rendering of css-in-js using glamor works, in order to get this working, I downgraded glamor to v2, it looks like v3 is in progress and is using/going-to-use a seperate package called `glamor-server`. Then I retrieved the styling from it using the code snippet:
+
+```js
+const {html, css, ids} = renderStatic(() => renderToString(<App />))
+```
+
+Just dump the css into the ejs template, which is easy enough, the ids also need to be in the template, this is used by glamor when it tries to generates css again and matches the ids and stands down allowing a single render instead of a double render on the client. However, on order for this to happen there is another piece of the puzzle that needs to be in place:
+
+```html
+<script type="text/javascript">
+  window._glam = JSON.stringify(<%= ids %>)
+</script>
+```
+
+> Values enclosed within `<%= %>` are evaluated and escaped for html
+
+In the `index` client file which is rendered, use:
+
+```js
+import {rehydrate} from 'glamor'
+
+const renderWithHmr = Component => {
+  rehydrate(window._glam)
+    render(<AppContainer><Component /></AppContainer>, app)
+}
+```
+
+After doing this, I came across the `compose` function from the strangely named `recompose`, a utility belt library for `React`, it looked like this, I copied it over in a haze into a utils directory and caught the functional programming in JS bug, in this sickness, I did some changes to the server.js file that might be of interest to you:
+
+**Original**
+
+```js
+const assets = normalizeAssets(stats.assetsByChunkName.main)		 +  const assets = assetsFromStats(stats)
+const styles = getLinks(assets)		 
+const {scripts, styles} = assets
+const scripts = getScripts(assets)
+debugger
+const fnForGlamor = makeFnForGlamor(App)
+const html = renderToString(<App />)
+const {html, css, ids} = renderStatic(fnForGlamor)
+const locals = {scripts, styles, html}
+const locals = {scripts, styles, css, ids, html}
+res.render('index', locals)
+```
+
+**Functional**
+
+```js
+// Functional Programming for the sake of Functional Programming,
+// extremely clever code, stop reading here, if compose is a hammer
+// every thing looks like a unary function
+
+  const simpleSSR = compose(renderToString, React.createElement)
+const makeFnForGlamor = App => () => simpleSSR(App)
+
+  const normalizeAssets = assets => {
+    return Array.isArray(assets) ? assets : [assets]
+  }
+
+const getLinks = assets => {
+  const styles = assets.filter(path => path.endsWith('.css'))
+    const links = styles.map(path => `<link rel="stylesheet" href="${path}" />`)
+    return links.join('\n')
+}
+
+const getScripts = assets => {
+  const js = assets.filter(path => path.endsWith('.js'))
+    const scripts = js.map(path => `<script src="${path}"></script>`)
+    return scripts.join('\n')
+}
+
+const extractAssets = assets => {
+  const styles = getLinks(assets)
+    const scripts = getScripts(assets)
+    return {styles, scripts}
+}
+
+const getChunk = stats => {
+  const {assetsByChunkName: assets} = stats
+    const {main} = assets
+    return main
+}
+
+const assetsFromStats = stats => {
+  return compose(extractAssets, normalizeAssets, getChunk)(stats)
+}
+```
+
+Then we go ahead and call this:
+
+```
+const stats = res.locals.webpackStats.toJson()
+const assets = assetsFromStats(stats)
+const {scripts, styles} = assets
+
+const fnForGlamor = makeFnForGlamor(App)
+const {html, css, ids} = renderStatic(fnForGlamor)
+```
+
+From the fevered scrawling of the author:
+
+My evil plan is to use rabid functional programming has been foiled first by `webpack-dev-middleware` which is bound to a context and performs internal mutations on its environment, thus making it nessecary for us to call `toJson` as is, if not it throws an error requiring that the context not be undefined.
+
+Also, glamor does not provide support for easy use within a compose function because it is a function that accepts a function, I tried to encapsulate it within a pure function:
+
+```js
+const makeFnForGlamor = App => () => simpleSSR(App)
+```
+
+which is then passed to `glamor`.
+
+I have noticed that as soon as you use the `.` operator, it becomes slightly harded to make your code functional, I try and use destructuring as much as possible to avoid accidental use of this operator as a setter instead of  a getter. Also, the use of this is a screw-you to anybody attempting to use your API in a functional style.
+
+Also, we notice that when we call a method on an object or an array, it operates under the assumption that it already knows the data, it will prevent the function first style of using higher order functions and optimizations for using pure functions, FP and OOP are not buddies, if you structure your API  a certain way, you are locked into it.
+
+Then I went on to add row and container to milligram, a css framework
+
+11 July 2017
+
+I created milligram column as well, while doing this I noticed a few things.
+
+Interestingly milligram does not specify meida query driven column sizes for display different styles of content for different viewports, instead it just relies on the user to do so. I believe this is to keep it minimal. A confusing aspect of using milligram is that it specifies row and column sizes in percent but instead of allowing users to specify any value between 0-100, it enforces values of its own such as `33, 34` and so on. It is a misfit in both ways as css framework.
+
+I had to rewrite the row and column to mutate the object as options were  verified and properties were added because it is idiomatic Javascript:
+
+**Bad**
+
+```js
+const oldRow = row
+row = {
+  ...oldRow,
+  [newProp]: newPropValue
+}
+```
+
+**Good**
+
+```js
+row.newProp = newPropValue
+```
+
+we can think about objects of data as single argument functions, in order to do so, one must also have appropriate error handling as or in addition to a default case. I found that a switch case was easier to understand in this case:
+
+**Bad**
+
+```js
+const alignmentConverter = {
+  top: {alignItems: 'flex-start'},
+  bottom: {alignItems: 'flex-end'},
+  center: {alignItems: 'center'},
+  stretch: {alignItems: 'stretch'},
+  baseline: {alignItems: 'baseline'}
+  }
+  const oldRow = row
+  row = {
+    ...oldRow,
+    ...alignmentConverter[alignment]
+  }
+```
+
+**Good**
+
+```js
+switch (alignment) {
+  case 'top':
+    row.alignItems = 'flex-start'
+      break
+  case 'bottom':
+      row.alignItems = 'flex-end'
+        break
+  case 'center':
+        row.alignItems = 'center'
+          break
+  case 'stretch':
+          row.alignItems = 'stretch'
+            break
+  case 'baseline':
+            row.alignItems = 'baseline'
+              break
+  default:
+              throw new Error(
+                  `The value provided for alignment must be one of ${JSON.stringify(ROW_ALIGNMENT_VALUES)}, instead you provided ${alignment}`
+                  )
+}
+```
+
+Another interesting thing about milligram is that it uses a default font size of 10px instead of the standard 16px.
