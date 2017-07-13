@@ -3,6 +3,7 @@
     [
       "env",
       {
+        "modules": false,
         "target": {
             "browsers": "> 5%",
             "node": true
@@ -13,12 +14,19 @@
   ],
   "plugins": [
     ["transform-class-properties"],
-    ["transform-object-rest-spread"]
+    ["transform-object-rest-spread"],
+    ["syntax-dynamic-import"]
   ],
   "env": {
       "development": {
         "plugins": [
           "react-hot-loader/babel"
+        ]
+      },
+      "test": {
+        "plugins": [
+          ["transform-es2015-modules-commonjs"],
+          ["dynamic-import-node"]
         ]
       }
     }

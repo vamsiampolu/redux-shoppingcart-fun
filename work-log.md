@@ -392,3 +392,25 @@ I have added the flexboxgrid styling as javascript in the file utils/box.js, the
 I also see the `glamorous` or `styled-components` side of the argument where they take away the awkward side of the wiring up of classNames and styles for components using glamor. With ease-of-use comes the inablility to inspect the output using anythingbut snapshots, this makes it a little awkward but they do solve a problem.
 
 Is this a good use case for theming with glamor/glamorous?
+
+Another thing that would be rather interesting to accomplish would be setting up `jest` for a project from scratch so that I can do unit testing and snapshots for when a component is done.
+
+Setting up jest for unit testing to avoid inertia and sloppy coding practices is a priority, I have decided to work on this first instead of working on theming of the boxes.
+
+I have installed jest and its dependencies:
+
+  1. jest
+  2. babel-jest
+  3. regenerator-runtime
+  4. babel-plugin-transform-es2015-modules-commonjs
+
+> I have also setup the `modules: false` when working with the `babel-preset-env`.
+
+I also pre-emptively set up:
+
+  1. babel-plugin-syntax-dynamic-import
+  2. babel-plugin-dynamic-import-node
+
+> AND I thought JAVA class names were long and unwieldy, sigh
+
+Now, we need to get webpack and jest to play well with one another, they have a nice configuration guide
