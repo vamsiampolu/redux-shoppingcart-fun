@@ -13,7 +13,7 @@ export const container = {
   paddingLeft: '2rem',
   paddingRight: '2rem',
 
-  maxWidth: '112rem',
+  maxWidth: '112rem', // = 1120px
 
   position: 'relative', // why use position relative here
   width: '100%'

@@ -386,3 +386,9 @@ switch (alignment) {
 ```
 
 Another interesting thing about milligram is that it uses a default font size of 10px instead of the standard 16px.
+
+I have added the flexboxgrid styling as javascript in the file utils/box.js, the next step is to build a demo of how flexbox is implemented by milligram, I introduced glamorous and created components for each of these boxes. I have noticed that each box relies on a base box style before it adds a few additional rules for its style.
+
+I also see the `glamorous` or `styled-components` side of the argument where they take away the awkward side of the wiring up of classNames and styles for components using glamor. With ease-of-use comes the inablility to inspect the output using anythingbut snapshots, this makes it a little awkward but they do solve a problem.
+
+Is this a good use case for theming with glamor/glamorous?
