@@ -67,7 +67,7 @@ This project's stated goal was to work on React, I have spent a  long time worki
 I added the module.hot flag to try and fix the issue occuring with react-hot-loader/patch which was complaining the `development` was not defined.
 Changing the order of reactHotLoader and webpackHmr entries did not affect the output much, there was no change to the error, it might be an incompatibility between the middleware and react-hot-loader.
 
-I just have the server working correctly with server rendering config from the webpack-dev-middleare although no output can be displayed, it can be a publicPath issue. I got the code working with the node debugger's support. I have to take this slow and keep debugging. 
+I just have the server working correctly with server rendering config from the webpack-dev-middleare although no output can be displayed, it can be a publicPath issue. I got the code working with the node debugger's support. I have to take this slow and keep debugging.
 
 This gives me a new error:
 
@@ -232,7 +232,7 @@ After doing this, I came across the `compose` function from the strangely named 
 
 ```js
 const assets = normalizeAssets(stats.assetsByChunkName.main)		 +  const assets = assetsFromStats(stats)
-const styles = getLinks(assets)		 
+const styles = getLinks(assets)
 const {scripts, styles} = assets
 const scripts = getScripts(assets)
 debugger
@@ -387,6 +387,8 @@ switch (alignment) {
 
 Another interesting thing about milligram is that it uses a default font size of 10px instead of the standard 16px.
 
+14 Jun 2017
+
 I have added the flexboxgrid styling as javascript in the file utils/box.js, the next step is to build a demo of how flexbox is implemented by milligram, I introduced glamorous and created components for each of these boxes. I have noticed that each box relies on a base box style before it adds a few additional rules for its style.
 
 I also see the `glamorous` or `styled-components` side of the argument where they take away the awkward side of the wiring up of classNames and styles for components using glamor. With ease-of-use comes the inablility to inspect the output using anythingbut snapshots, this makes it a little awkward but they do solve a problem.
@@ -413,4 +415,31 @@ I also pre-emptively set up:
 
 > AND I thought JAVA class names were long and unwieldy, sigh
 
-Now, we need to get webpack and jest to play well with one another, they have a nice configuration guide
+Now, we need to get webpack and jest to play well with one another, they have a nice configuration guide, it also leaves me wondering if I need to use a different env variable setting with babel for server and client bundling.
+
+15 July 2017,
+
+I have finished a basic jest config for interop with webpack2. In order to do this, I setup mocks for
+
+1. css files used
+
+2. assets used
+
+There are other bits of configuration for webpack `resolve` field properties such as `moduleDirectories`, `moduleExtensions` and `alias`. I have
+skipped any such configuration there are no plans to use those fields here and now. If my plans change, I will add those in as well
+
+Now, I need `jest` interop with `enzyme` and I need to figure out if `glamor` or `glamorous` need special configuration to work with `jest`
+
+The setup for enzyme and jest compatibility is so small, install:
+
+1. react-test-renderer for snapshot testing
+
+2. enzyme
+
+and thats it. However, I checked out what `Dan Abramov` is doing, he uses a few polyfills as setup files in `create-react-app`. Also from my prior experiences I remeber having to add `matchMedia` polyfill to get it working with mount rendering.
+
+So, I added the following to a `setupFile`:
+
+1. whatwg-fetch
+
+2. matchMedia polyfill
