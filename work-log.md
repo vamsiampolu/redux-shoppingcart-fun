@@ -443,3 +443,5 @@ So, I added the following to a `setupFile`:
 1. whatwg-fetch
 
 2. matchMedia polyfill
+
+One also needs to add a custom snapshot serializer and a corresponding matcher when working with glamor or glamorous. This is going to replae the inane className with the actual css in the snapshot making it easier to compare.
